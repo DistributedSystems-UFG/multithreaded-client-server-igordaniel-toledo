@@ -1,60 +1,87 @@
-# Sistema Cliente-Servidor: Calculadora Distribuída
+Sistema Cliente-Servidor com Multithreading
+Descrição
 
-## Descrição
+Este projeto implementa um sistema cliente-servidor utilizando sockets TCP em Python, com o objetivo de processar operações matemáticas enviadas pelo cliente.
 
-Este projeto implementa um sistema distribuído simples utilizando sockets TCP em Python. O sistema consiste em um cliente e um servidor, onde o servidor realiza operações matemáticas solicitadas remotamente pelo cliente.
+O sistema foi desenvolvido em três versões para análise de desempenho:
 
-## Funcionalidades
+Single-thread (execução sequencial)
+Multithreading apenas no servidor
+Multithreading no cliente e no servidor
+Funcionalidades
 
-O servidor oferece as seguintes operações:
+O cliente envia operações no seguinte formato:
 
-* Soma (`add`)
-* Subtração (`sub`)
-* Multiplicação (`mul`)
-* Divisão (`div`)
+operacao num1 num2
 
-O cliente envia uma requisição contendo a operação desejada e dois valores numéricos. O servidor processa os dados e retorna o resultado.
+Exemplos:
 
-## Formato das mensagens
-
-O cliente deve enviar mensagens no seguinte formato:
-
-operacao valor1 valor2[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/7EVNAYx2)
-# ClientServerBasics (2.0)
-Starter code for the basic client-server assignment
-
-
-Este template corresponde ao exemplo da Fig. 2.3 do livro. O exercício consiste em acrescentar funcionalidade ao servidor para torná-lo mais útil. Essa funcionalidade deve ser acessível aos clientes. Por exemplo, o servidor pode ser uma espécie de calculadora remota. O cliente passa dois valores numéricos, juntamente com o nome de uma operação (ex.: add, subtract, multiply, divide) e o servidor executa a operação respectiva e retorna seu resultado para o cliente. Você pode implementar um servidor com outras funcionalidades (diferente da calculadora). O imporante é que ele ofereça pelo menos três operações diferentes que os clientes podem utilizar remotamente, passando dados para serem processados e recebendo o resultado desse processamento como resposta.
-
-Tarefa individual.
-
-Incluir um Readme descritivo do sistema implementado.
-
-Exemplo:
 add 10 5
+sub 8 3
+mul 4 6
+div 10 2
 
-## Execução
+O servidor processa a operação e retorna o resultado ao cliente.
 
-1. Inicie o servidor:
-   python server.py
+Implementações
+1. Versão Single-thread
+O cliente envia requisições de forma sequencial
+O servidor atende apenas um cliente por vez
 
-2. Em outro terminal, execute o cliente:
-   python client.py
+Essa abordagem é simples, porém apresenta baixo desempenho com muitas requisições.
 
-3. Digite as operações no cliente.
+2. Multithreading no Servidor
+O servidor cria uma thread para cada cliente conectado
+O cliente continua enviando requisições de forma sequencial
 
-## Tratamento de erros
+Essa abordagem permite o atendimento simultâneo de múltiplos clientes.
 
-* Operações inválidas são tratadas pelo servidor.
-* Divisão por zero retorna mensagem de erro.
-* Formatos incorretos também são tratados.
+3. Multithreading no Cliente e no Servidor
+O cliente cria uma thread para cada requisição enviada
+O servidor cria uma thread para cada conexão recebida
 
-## Tecnologias utilizadas
+Essa abordagem maximiza o paralelismo e apresenta o melhor desempenho.
 
-* Python
-* Sockets TCP
+Geração Automática de Requisições
 
-## Observações
+Na versão multithread do cliente, as requisições são geradas automaticamente utilizando números aleatórios:
 
-O sistema suporta comunicação contínua até que o cliente digite "sair".
+Operações: add, sub, mul, div
+Valores entre 1 e 100
+Medição de Desempenho
 
+O tempo total de execução é medido no cliente utilizando a função:
+
+time.time()
+Resultados (exemplo)
+
+Quantidade de requisições: 100
+
+Single-thread: 5.23 s
+Multithreading apenas no servidor: 2.11 s
+Multithreading no cliente e servidor: 0.89 s
+Análise
+
+A versão single-thread apresentou maior tempo de execução devido ao processamento sequencial das requisições.
+
+A versão com multithreading no servidor apresentou melhora no desempenho ao permitir o atendimento simultâneo de múltiplos clientes.
+
+A versão com multithreading tanto no cliente quanto no servidor apresentou o melhor desempenho, devido ao envio e processamento paralelo das requisições.
+
+Como Executar
+1. Configurar o endereço
+
+No arquivo constCS.py:
+
+HOST = '127.0.0.1'
+PORT = 5678
+2. Executar o servidor
+python server_multithread.py
+3. Executar o cliente
+python client_multithread.py
+Estrutura do Projeto
+.
+├── client_multithread.py
+├── server_multithread.py
+├── constCS.py
+└── README.md
