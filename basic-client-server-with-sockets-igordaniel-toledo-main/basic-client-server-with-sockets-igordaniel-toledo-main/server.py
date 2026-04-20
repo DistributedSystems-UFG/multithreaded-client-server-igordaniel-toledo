@@ -1,5 +1,6 @@
 from socket import *
 from constCS import *
+import threading
 
 def calcular(operacao, a, b):
     if operacao == "add":
@@ -15,32 +16,44 @@ def calcular(operacao, a, b):
     else:
         return "Erro: operação inválida"
 
+# ✅ função para cada cliente (thread)
+def atender_cliente(conn, addr):
+    print("Conectado por:", addr)
+
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+
+        mensagem = data.decode()
+        print(f"[{addr}] Recebido:", mensagem)
+
+        try:
+            partes = mensagem.split()
+            operacao = partes[0]
+            a = float(partes[1])
+            b = float(partes[2])
+
+            resultado = calcular(operacao, a, b)
+        except:
+            resultado = "Erro no formato. Use: operacao num1 num2"
+
+        conn.send(str.encode(str(resultado)))
+
+    conn.close()
+    print("Desconectado:", addr)
+
+
+# socket principal
 s = socket(AF_INET, SOCK_STREAM)
 s.bind((HOST, PORT))
-s.listen(1)
+s.listen()
 
-print("Servidor aguardando conexão...")
-(conn, addr) = s.accept()
-print("Conectado por:", addr)
+print("Servidor aguardando conexões...")
 
 while True:
-    data = conn.recv(1024)
-    if not data:
-        break
+    conn, addr = s.accept()
 
-    mensagem = data.decode()
-    print("Recebido:", mensagem)
-
-    try:
-        partes = mensagem.split()
-        operacao = partes[0]
-        a = float(partes[1])
-        b = float(partes[2])
-
-        resultado = calcular(operacao, a, b)
-    except:
-        resultado = "Erro no formato. Use: operacao num1 num2"
-
-    conn.send(str.encode(str(resultado)))
-
-conn.close()
+    # ✅ nova thread por cliente
+    t = threading.Thread(target=atender_cliente, args=(conn, addr))
+    t.start()
